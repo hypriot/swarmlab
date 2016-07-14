@@ -1,0 +1,38 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+# per default the Swarm Lab starts with three nodes
+# a different number of nodes can be provided with the
+# NUMBER_OF_NODES environment variable
+
+number_of_nodes = ENV['NUMBER_OF_NODES'] || 3
+
+# the number of total nodes minus the leader is the number of followers
+number_of_followers = number_of_nodes.to_i - 1
+
+raise 'The Swarm Lab needs at least 3 nodes to operate' if (number_of_nodes < 3)
+
+Vagrant.configure(2) do |config|
+
+  config.vm.network "private_network", type: "dhcp"
+
+  config.vm.define "leader" do |leader|
+    leader.vm.box = "ubuntu/wily64"
+    leader.vm.hostname = 'leader'
+  end
+
+  (1..number_of_followers).each do |node_number|
+    config.vm.define "follower#{node_number}" do |follower|
+      follower.vm.box = "ubuntu/wily64"
+      follower.vm.hostname = "follower#{node_number}"
+    end
+  end
+
+  config.vm.synced_folder "..", "/cluster-lab-src"
+
+  config.vm.provider "virtualbox" do |vb|
+    vb.memory = "1024"
+  end
+
+  config.vm.provision "shell", keep_color: true, path: "setup_swarm_lab.sh"
+end
