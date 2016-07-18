@@ -9,6 +9,10 @@ number_of_nodes = ENV['NUMBER_OF_NODES'] || 3
 
 Vagrant.configure(2) do |config|
 
+  if Vagrant.has_plugin?("vagrant-vbguest") then
+    config.vbguest.auto_update = true
+  end
+
   config.vm.network "private_network", type: "dhcp"
 
   (1..number_of_nodes).each do |node_number|
@@ -23,5 +27,14 @@ Vagrant.configure(2) do |config|
     vb.linked_clone = true if Vagrant::VERSION =~ /^1.8/
   end
 
-  config.vm.provision "shell", keep_color: true, path: "setup_swarmlab.sh"
+  if Vagrant::VERSION =~ /^1.8.4/ then
+    config.vm.provision "ansible_local" do |ansible|
+      ansible.playbook = "playbook.yml"
+      #ansible.verbose = 'vvvv'
+      ansible.install = true
+      ansible.install_mode = :pip
+    end
+  else
+    config.vm.provision "shell", keep_color: true, path: "setup_swarmlab.sh"
+  end  
 end
