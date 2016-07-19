@@ -1,0 +1,32 @@
+---
+- hosts: all
+  become: yes
+
+  tasks:
+  - name: Adding docker apt-key
+    apt_key:
+      keyserver: hkp://p80.pool.sks-keyservers.net:80
+      id: 58118E89F3A912897C070ADBF76221572C52609D
+
+  - name: Adding repository
+    apt_repository:
+      repo: 'deb https://apt.dockerproject.org/repo ubuntu-wily testing'
+      state: present
+
+  - name: Getting kernel VERSION
+    command: uname -r
+    register: uname_r
+
+  - name: Installing packages
+    apt:
+      name: "{{item}}"
+
+    with_items:
+      - linux-image-extra-{{uname_r.stdout}}
+      - docker-engine
+
+  - name: Vagrant in group docker
+    user:
+      name: vagrant
+      groups: docker
+      append: yes

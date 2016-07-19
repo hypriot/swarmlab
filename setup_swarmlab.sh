@@ -7,4 +7,4 @@ echo "deb https://apt.dockerproject.org/repo ubuntu-wily testing" > /etc/apt/sou
 apt-get update
 
 apt-get install -y linux-image-extra-"$(uname -r)"
-apt-get install -y docker-engine=1.12.0~rc3-0~wily
+apt-get install -y docker-engine=1.12.0~rc4-0~wily
