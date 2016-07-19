@@ -24,3 +24,9 @@
     with_items:
       - linux-image-extra-{{uname_r.stdout}}
       - docker-engine
+
+  - name: Vagrant in group docker
+    user:
+      name: vagrant
+      groups: docker
+      append: yes
